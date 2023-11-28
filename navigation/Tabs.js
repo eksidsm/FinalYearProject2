@@ -7,26 +7,52 @@ import RegisterScreen from '../screens/RegisterScreen';
 import LoginScreen from '../screens/LoginScreen';
 import FormScreen from '../screens/FormScreen';
 import RecordScreen from '../screens/RecordScreen';
-import { createStackNavigator } from '@react-navigation/stack';
+import {createStackNavigator} from '@react-navigation/stack';
 import AdminHomeScreen from '../screens/AdminHomeScreen';
+import EmployeeScreen from '../screens/EmployeeScreen';
 
 const Tab = createBottomTabNavigator();
 const Stack = createStackNavigator();
 const rh = Dimensions.get('window').height;
 const rw = Dimensions.get('window').width;
 
-export default class StackNav extends Component{
-    render(){
-        return (
-        <Stack.Navigator>
-            <Stack.Screen name='LoginScreen' component={LoginScreen} options={{headerShown: false}}/>
-            <Stack.Screen name='Tabs' component={Tabs} options={{headerShown: false}}/>
-            <Stack.Screen name='Tabs2' component={Tabs2} options={{headerShown: false}} />
-            <Stack.Screen name='FormScreen' component={FormScreen} options={{headerShown: false}}/>
-            <Stack.Screen name='RecordScreen' component={RecordScreen} options={{headerShown: false}}/>
-        </Stack.Navigator>
-        )
-    }
+export default class StackNav extends Component {
+  render() {
+    return (
+      <Stack.Navigator>
+        <Stack.Screen
+          name="LoginScreen"
+          component={LoginScreen}
+          options={{headerShown: false}}
+        />
+        <Stack.Screen
+          name="RegisterScreen"
+          component={RegisterScreen}
+          options={{headerShown: false}}
+        />
+        <Stack.Screen
+          name="Tabs"
+          component={Tabs}
+          options={{headerShown: false}}
+        />
+        <Stack.Screen
+          name="Tabs2"
+          component={Tabs2}
+          options={{headerShown: false}}
+        />
+        <Stack.Screen
+          name="FormScreen"
+          component={FormScreen}
+          options={{headerShown: false}}
+        />
+        <Stack.Screen
+          name="RecordScreen"
+          component={RecordScreen}
+          options={{headerShown: false}}
+        />
+      </Stack.Navigator>
+    );
+  }
 }
 
 class Tabs extends Component {
@@ -52,16 +78,31 @@ class Tabs extends Component {
           options={{
             headerShown: false,
             tabBarIcon: ({focused}) => (
-              <View style={{justifyContent: 'center', alignItems: 'center', }}>
+              <View
+                style={{
+                  justifyContent: 'center',
+                  alignItems: 'center',
+                  top: rh * 0.015,
+                }}>
                 <Image
-                  source={focused ? require('../assets/homec.png') : require('../assets/home.png')}
+                  source={
+                    focused
+                      ? require('../assets/homec.png')
+                      : require('../assets/home.png')
+                  }
                   resizeMode="contain"
                   style={{
                     width: rw * 0.08,
-                    height: rh *0.05,
+                    height: rh * 0.05,
                   }}
                 />
-                <Text style={{color: focused ? 'black' : 'grey', fontWeight: focused ? 'bold' : 'null'}}>Home</Text>
+                <Text
+                  style={{
+                    color: focused ? 'black' : 'grey',
+                    fontWeight: focused ? 'bold' : 'null',
+                  }}>
+                  Home
+                </Text>
               </View>
             ),
           }}
@@ -69,21 +110,37 @@ class Tabs extends Component {
         <Tab.Screen
           name="Profile"
           component={ProfileScreen}
-          options={{headerShown: false,
+          options={{
+            headerShown: false,
             tabBarIcon: ({focused}) => (
-                <View>
-                  <Image
-                    source={focused ? require('../assets/userc.png') : require('../assets/user.png')}
-                    resizeMode="contain"
-                    style={{
-                      width: rw * 0.08,
-                      height: rh * 0.05,
-                    }}
-                  />
-                  <Text style={{color: focused ? 'black' : 'grey', fontWeight: focused ? 'bold' : 'null'}}>Profile</Text>
-                </View>
-              ),
-        }}
+              <View
+                style={{
+                  justifyContent: 'center',
+                  alignItems: 'center',
+                  top: rh * 0.015,
+                }}>
+                <Image
+                  source={
+                    focused
+                      ? require('../assets/userc.png')
+                      : require('../assets/user.png')
+                  }
+                  resizeMode="contain"
+                  style={{
+                    width: rw * 0.08,
+                    height: rh * 0.05,
+                  }}
+                />
+                <Text
+                  style={{
+                    color: focused ? 'black' : 'grey',
+                    fontWeight: focused ? 'bold' : 'null',
+                  }}>
+                  Profile
+                </Text>
+              </View>
+            ),
+          }}
         />
       </Tab.Navigator>
     );
@@ -91,9 +148,9 @@ class Tabs extends Component {
 }
 
 class Tabs2 extends Component {
-    render(){
-        return (
-            <Tab.Navigator
+  render() {
+    return (
+      <Tab.Navigator
         screenOptions={{
           tabBarStyle: {
             position: 'absolute',
@@ -113,16 +170,31 @@ class Tabs2 extends Component {
           options={{
             headerShown: false,
             tabBarIcon: ({focused}) => (
-              <View style={{justifyContent: 'center', alignItems: 'center', }}>
+              <View
+                style={{
+                  justifyContent: 'center',
+                  alignItems: 'center',
+                  top: rh * 0.015,
+                }}>
                 <Image
-                  source={focused ? require('../assets/homec.png') : require('../assets/home.png')}
+                  source={
+                    focused
+                      ? require('../assets/homec.png')
+                      : require('../assets/home.png')
+                  }
                   resizeMode="contain"
                   style={{
                     width: rw * 0.08,
-                    height: rh *0.05,
+                    height: rh * 0.05,
                   }}
                 />
-                <Text style={{color: focused ? 'black' : 'grey', fontWeight: focused ? 'bold' : 'null'}}>Home</Text>
+                <Text
+                  style={{
+                    color: focused ? 'black' : 'grey',
+                    fontWeight: focused ? 'bold' : 'null',
+                  }}>
+                  Home
+                </Text>
               </View>
             ),
           }}
@@ -130,44 +202,76 @@ class Tabs2 extends Component {
         <Tab.Screen
           name="Profile"
           component={ProfileScreen}
-          options={{headerShown: false,
+          options={{
+            headerShown: false,
             tabBarIcon: ({focused}) => (
-                <View>
-                  <Image
-                    source={focused ? require('../assets/userc.png') : require('../assets/user.png')}
-                    resizeMode="contain"
-                    style={{
-                      width: rw * 0.08,
-                      height: rh * 0.05,
-                    }}
-                  />
-                  <Text style={{color: focused ? 'black' : 'grey', fontWeight: focused ? 'bold' : 'null'}}>Profile</Text>
-                </View>
-              ),
-        }}
+              <View
+                style={{
+                  justifyContent: 'center',
+                  alignItems: 'center',
+                  top: rh * 0.015,
+                }}>
+                <Image
+                  source={
+                    focused
+                      ? require('../assets/userc.png')
+                      : require('../assets/user.png')
+                  }
+                  resizeMode="contain"
+                  style={{
+                    width: rw * 0.08,
+                    height: rh * 0.05,
+                  }}
+                />
+                <Text
+                  style={{
+                    color: focused ? 'black' : 'grey',
+                    fontWeight: focused ? 'bold' : 'null',
+                  }}>
+                  Profile
+                </Text>
+              </View>
+            ),
+          }}
         />
         <Tab.Screen
-          name="Register"
-          component={RegisterScreen}
-          options={{headerShown: false,
+          name="AddEmployee"
+          component={EmployeeScreen}
+          options={{
+            headerShown: false,
             tabBarIcon: ({focused}) => (
-                <View>
-                  <Image
-                    source={focused ? require('../assets/add-userc.png') : require('../assets/add-user.png')}
-                    resizeMode="contain"
-                    style={{
-                      width: rw * 0.08,
-                      height: rh * 0.05,
-                    }}
-                  />
-                  <Text style={{color: focused ? 'black' : 'grey', fontWeight: focused ? 'bold' : 'null'}}>Register</Text>
-                </View>
-              ),
-        }}
+              <View
+                style={{
+                  justifyContent: 'center',
+                  alignItems: 'center',
+                  top: rh * 0.015,
+                }}>
+                <Image
+                  source={
+                    focused
+                      ? require('../assets/add-userc.png')
+                      : require('../assets/add-user.png')
+                  }
+                  resizeMode="contain"
+                  style={{
+                    width: rw * 0.08,
+                    height: rh * 0.05,
+                  }}
+                />
+                <Text
+                  style={{
+                    color: focused ? 'black' : 'grey',
+                    fontWeight: focused ? 'bold' : 'null',
+                  }}>
+                  Register
+                </Text>
+              </View>
+            ),
+          }}
         />
       </Tab.Navigator>
-        )
-    }
+    );
+  }
 }
 
 const styles = StyleSheet.create({
