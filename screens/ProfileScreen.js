@@ -8,34 +8,97 @@ import {
 } from 'react-native';
 import React, {Component} from 'react';
 import {TouchableOpacity} from 'react-native-gesture-handler';
+import auth from '@react-native-firebase/auth';
+import firestore from '@react-native-firebase/firestore';
 
 const rh = Dimensions.get('window').height;
 const rw = Dimensions.get('window').width;
 
 export default class ProfileScreen extends Component {
-  handleSignOut = () => {
-    //firestore auth for signout
-    console.log('Signed out');
-    this.props.navigation.navigate('LoginScreen');
+  constructor(props) {
+    super(props);
+    this.state = {
+    position: '',
+    branch: '',
+    //starsRating: '',
+    phoneNB: '',
+    fullName: '',
+    id: '',
+    };
+  }
+
+  componentDidMount() {
+    this.fetchUserData();
+  }
+
+  fetchUserData = () => {
+    const user = auth().currentUser;
+    if (user) {
+      const uid = user.uid;
+      const userRef = firestore().collection('users').doc(uid);
+
+      // Subscribe to the user document
+      const unsubscribe = userRef.onSnapshot((doc) => {
+        if (doc.exists) {
+          const userData = doc.data();
+          this.setState({
+            position: userData.jobPosition,
+            branch: userData.restaurant,
+            starsRating: userData.starsRating,
+            phoneNB: userData.phoneNB,
+            fullName: userData.fullName,
+            id: userData.id,
+          });
+        }
+      });
+
+      // Unsubscribe when the component unmounts
+      this.unsubscribe = unsubscribe;
+    }
   };
+
+  componentWillUnmount() {
+    // Unsubscribe when the component unmounts to avoid memory leaks
+    if (this.unsubscribe) {
+      this.unsubscribe();
+    }
+  }
+
+  signOut = () => {
+    auth()
+      .signOut()
+      .then(() => {
+        console.log('User Signed Out.');
+        this.props.navigation.navigate('LoginScreen');
+      })
+      .catch(error => {
+        console.error('Sign-out error:', error);
+      });
+  };
+
   render() {
+    const { position, branch, starsRating, phoneNB, fullName, id } = this.state;
+
     return (
       <View>
         <ImageBackground
           source={require('../assets/bg2.jpg')}
           style={{width: rw, height: rh}}>
-          <View style={styles.imageContainer}>
-            <TouchableOpacity>
-              <Text>Upload Your Image</Text>
-            </TouchableOpacity>
+
+          {/* User Information Container */}
+          <View style={styles.userInfoContainer}>
+            <Text style={styles.userName}>Name: {fullName}</Text>
           </View>
-          <TouchableOpacity style={styles.signout} onPress={this.handleSignOut}>
+
+          {/* Signout Button */}
+          <TouchableOpacity style={styles.signout} onPress={this.signOut}>
             <Image
               source={require('../assets/logout.png')}
               style={{width: rw * 0.07, height: rh * 0.035}}
             />
           </TouchableOpacity>
 
+          {/* Job Characteristics Container */}
           <View style={styles.details}>
             <Text
               style={{
@@ -49,22 +112,22 @@ export default class ProfileScreen extends Component {
             <View style={{marginTop: rh * 0.01}}>
               <Text style={styles.title}>Position: </Text>
               <View style={styles.info}>
-                <Text style={styles.innertxt}>uid.position</Text>
+                <Text style={styles.innertxt}>{position}</Text>
               </View>
 
               <Text style={styles.title}>Branch & Location: </Text>
               <View style={styles.info}>
-                <Text style={styles.innertxt}>uid.branch</Text>
+                <Text style={styles.innertxt}>{branch}</Text>
+              </View>
+
+              <Text style={styles.title}>ID: </Text>
+              <View style={styles.info}>
+                <Text style={styles.innertxt}>{id}</Text>
               </View>
 
               <Text style={styles.title}>Phone Number: </Text>
               <View style={styles.info}>
-                <Text style={styles.innertxt}>uid.starsRating</Text>
-              </View>
-
-              <Text style={styles.title}>Overall Stars Rating: </Text>
-              <View style={styles.info}>
-                <Text style={styles.innertxt}>uid.phoneNB</Text>
+                <Text style={styles.innertxt}>{phoneNB}</Text>
               </View>
             </View>
           </View>
@@ -80,15 +143,24 @@ const styles = StyleSheet.create({
     marginLeft: rw * 0.04,
     color: 'black',
   },
-  imageContainer: {
-    width: rw * 0.45,
-    height: rh * 0.22,
+  userInfoContainer: {
+    width: rw * 0.70,
+    height: rh * 0.15,
     alignSelf: 'center',
-    borderRadius: 100,
     backgroundColor: 'lightgrey',
     marginTop: rh * 0.05,
     justifyContent: 'center',
     alignItems: 'center',
+    borderRadius: 20
+  },
+  userName: {
+    fontSize: 25,
+    fontWeight: 'bold',
+    color: 'black'
+  },
+  userId: {
+    fontSize: 18,
+    color: 'black',
   },
   details: {
     width: rw,
@@ -99,7 +171,7 @@ const styles = StyleSheet.create({
   },
   info: {
     width: rw * 0.9,
-    height: rh * 0.07,
+    height: rh * 0.08,
     borderRadius: 10,
     backgroundColor: 'lightgrey',
     marginLeft: rw * 0.04,
@@ -109,6 +181,7 @@ const styles = StyleSheet.create({
   },
   innertxt: {
     fontSize: 20,
+    color: 'grey'
   },
   signout: {
     width: rw * 0.17,

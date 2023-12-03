@@ -10,6 +10,8 @@ import RecordScreen from '../screens/RecordScreen';
 import {createStackNavigator} from '@react-navigation/stack';
 import AdminHomeScreen from '../screens/AdminHomeScreen';
 import EmployeeScreen from '../screens/EmployeeScreen';
+import UserReviews from '../screens/UserReviews';
+
 
 const Tab = createBottomTabNavigator();
 const Stack = createStackNavigator();
@@ -82,7 +84,7 @@ class Tabs extends Component {
                 style={{
                   justifyContent: 'center',
                   alignItems: 'center',
-                  top: rh * 0.015,
+                  top: rh * 0.003,
                 }}>
                 <Image
                   source={
@@ -107,6 +109,41 @@ class Tabs extends Component {
             ),
           }}
         />
+            <Tab.Screen
+          name="userReviews"
+          component={UserReviews}
+          options={{
+            headerShown: false,
+            tabBarIcon: ({focused}) => (
+              <View
+                style={{
+                  justifyContent: 'center',
+                  alignItems: 'center',
+                  top: rh * 0.003,
+                }}>
+                <Image
+                  source={
+                    focused
+                      ? require('../assets/userc.png')
+                      : require('../assets/user.png')
+                  }
+                  resizeMode="contain"
+                  style={{
+                    width: rw * 0.08,
+                    height: rh * 0.05,
+                  }}
+                />
+                <Text
+                  style={{
+                    color: focused ? 'black' : 'grey',
+                    fontWeight: focused ? 'bold' : 'null',
+                  }}>
+                  Reviews
+                </Text>
+              </View>
+            ),
+          }}
+        />
         <Tab.Screen
           name="Profile"
           component={ProfileScreen}
@@ -117,7 +154,7 @@ class Tabs extends Component {
                 style={{
                   justifyContent: 'center',
                   alignItems: 'center',
-                  top: rh * 0.015,
+                  top: rh * 0.003,
                 }}>
                 <Image
                   source={
@@ -174,7 +211,7 @@ class Tabs2 extends Component {
                 style={{
                   justifyContent: 'center',
                   alignItems: 'center',
-                  top: rh * 0.015,
+                  top: rh * 0.003,
                 }}>
                 <Image
                   source={
@@ -199,6 +236,7 @@ class Tabs2 extends Component {
             ),
           }}
         />
+      
         <Tab.Screen
           name="Profile"
           component={ProfileScreen}
@@ -209,7 +247,7 @@ class Tabs2 extends Component {
                 style={{
                   justifyContent: 'center',
                   alignItems: 'center',
-                  top: rh * 0.015,
+                  top: rh * 0.003,
                 }}>
                 <Image
                   source={
@@ -244,7 +282,7 @@ class Tabs2 extends Component {
                 style={{
                   justifyContent: 'center',
                   alignItems: 'center',
-                  top: rh * 0.015,
+                  top: rh * 0.003,
                 }}>
                 <Image
                   source={

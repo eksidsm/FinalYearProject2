@@ -10,6 +10,8 @@ import {
 } from 'react-native';
 import React, {Component} from 'react';
 import {SelectList} from 'react-native-dropdown-select-list';
+import firestore from '@react-native-firebase/firestore'
+import auth from '@react-native-firebase/auth'
 
 const rh = Dimensions.get('window').height;
 const rw = Dimensions.get('window').width;
@@ -62,42 +64,60 @@ class ByDate extends Component {
 }
 
 class ByWaiter extends Component {
+  constructor(props) {
+    super(props);
+    this.state = {
+      employees: [],
+    };
+  }
+
+  componentDidMount() {
+    const user = auth().currentUser;
+    if (user) {
+      const adminUid = user.uid;
+      console.log(adminUid);
+      this.fetchEmployees(adminUid);
+    }
+  }
+
+  fetchEmployees = async (adminUid) => {
+    try {
+      console.log('uid sent is', adminUid);
+      const employeesCollection = await firestore()
+        .collection('admins')
+        .doc(adminUid)
+        .collection('employees')
+        .get();
+
+        const employeeList = employeesCollection.docs.map(employeeDoc => {
+          const employeeData = employeeDoc.data();
+          console.log('Fetched employee data:', employeeData); // Add this line for debugging
+          return {
+            id: employeeDoc.id,
+            name: employeeData.name,
+            fullName: employeeData.employeeName,
+          };
+        });
+
+      this.setState({ employees: employeeList });
+    } catch (error) {
+      console.error('Error fetching employees:', error);
+    }
+  };
+
   render() {
+    const { employees } = this.state;
+
     return (
-      <View style={styles.reviewsByWaiters}>
-        <Text>Reviews By waiters</Text>
-        <TouchableOpacity style={styles.singleElement}>
-          <Text style={{paddingHorizontal: rw * 0.03, fontSize: 18}}>
-            Waiter A
-          </Text>
-          <Text style={{paddingHorizontal: rw * 0.03, fontSize: 18}}>
-            Last 10 Reviews Stars Average: 99.-98y098g087g087g087g7
-          </Text>
-        </TouchableOpacity>
-        <TouchableOpacity style={styles.singleElement}>
-          <Text style={{paddingHorizontal: rw * 0.03, fontSize: 18}}>
-            Review for Waiter A
-          </Text>
-          <Text style={{paddingHorizontal: rw * 0.03, fontSize: 18}}>
-            Last 10 Reviews Stars Average: 4.5
-          </Text>
-        </TouchableOpacity>
-        <TouchableOpacity style={styles.singleElement}>
-          <Text style={{paddingHorizontal: rw * 0.03, fontSize: 18}}>
-            Review for Waiter A
-          </Text>
-          <Text style={{paddingHorizontal: rw * 0.03, fontSize: 18}}>
-            Last 10 Reviews Stars Average: 4.0
-          </Text>
-        </TouchableOpacity>
-        <TouchableOpacity style={styles.singleElement}>
-          <Text style={{paddingHorizontal: rw * 0.03, fontSize: 18}}>
-            Review for Waiter A
-          </Text>
-          <Text style={{paddingHorizontal: rw * 0.03, fontSize: 18}}>
-            Last 10 Reviews Stars Average: 3.3
-          </Text>
-        </TouchableOpacity>
+      <View style={styles.container}>
+        {employees.map(employee => (
+          <TouchableOpacity
+            key={employee.id}
+            style={styles.singleElement}>
+            <Text style={{ paddingHorizontal: rw * 0.03, fontSize: 18 }}>Name: {employee.fullName}</Text>
+            <Text style={{ paddingHorizontal: rw * 0.03, fontSize: 18 }}>ID: {employee.id}</Text>
+          </TouchableOpacity>
+        ))}
       </View>
     );
   }
@@ -113,7 +133,6 @@ export default class AdminHomeScreen extends Component {
 
   setSelected = newval => {
     this.setState({selected: newval});
-    console.log(this.state.selected);
   };
 
   render() {
@@ -179,3 +198,4 @@ const styles = StyleSheet.create({
     flexGrow: 1,
   },
 });
+

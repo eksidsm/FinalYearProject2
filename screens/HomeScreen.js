@@ -9,14 +9,48 @@ import {
   SafeAreaView,
 } from 'react-native';
 import React, {Component} from 'react';
+import firestore from '@react-native-firebase/firestore';
+import auth from '@react-native-firebase/auth';
 
 const rh = Dimensions.get('window').height;
 const rw = Dimensions.get('window').width;
 
 export default class HomeScreen extends Component {
+  constructor(props) {
+    super(props);
+    this.state = {
+      fullName: '',
+    };
+  }
+
+  componentDidMount() {
+    // Fetch user data from Firestore
+    this.fetchUserData();
+  }
+
+  fetchUserData = () => {
+    const user = auth().currentUser;
+    if (user) {
+      const uid = user.uid;
+      const userRef = firestore().collection('users').doc(uid);
+
+      userRef.get().then((doc) => {
+        if (doc.exists) {
+          const userData = doc.data();
+          this.setState({
+            fullName: userData.fullName,
+          });
+        } else {
+          console.log('No such document!');
+        }
+      });
+    }
+  };
+
   handlePlus = () => {
     this.props.navigation.navigate('FormScreen');
   };
+
   render() {
     return (
       <View>
@@ -24,7 +58,7 @@ export default class HomeScreen extends Component {
           source={require('../assets/bg2.jpg')}
           style={{height: rh, width: rw}}>
           <SafeAreaView style={styles.header}>
-            <Text style={{fontSize: rh * 0.03}}>Welcome Username</Text>
+            <Text style={{fontSize: rh * 0.03}}>Welcome {this.state.fullName}</Text>
           </SafeAreaView>
 
           <Text style={styles.title}>Add A Review</Text>

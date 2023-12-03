@@ -13,6 +13,8 @@ import {
 import React, {Component} from 'react';
 import styles from '../globalStyles';
 import {ScrollView} from 'react-native-gesture-handler';
+import auth from '@react-native-firebase/auth'
+import firestore from '@react-native-firebase/firestore'
 
 const rh = Dimensions.get('window').height;
 const rw = Dimensions.get('window').width;
@@ -25,18 +27,53 @@ export default class LoginScreen extends Component {
       pass: '',
     };
   }
-  handleLogin = () => {
-    console.log(this.state.email);
-    console.log(this.state.pass);
-    if (this.state.email === 'admin' && this.state.pass === 'admin') {
-      this.props.navigation.navigate('Tabs2');
-    } else if (this.state.email === 'user' && this.state.pass === 'user') {
-      this.props.navigation.navigate('Tabs');
-    } else {
-      Alert.alert('Error', 'Incorrect Username or Password');
+  logIn = async () => {
+    const { email, pass } = this.state;
+  
+    try {
+      const userCredential = await auth().signInWithEmailAndPassword(email, pass);
+      const user = userCredential.user;
+  
+      const userDoc = await firestore().collection('users').doc(user.uid).get();
+  
+      if (userDoc.exists) {
+        const userData = userDoc.data();
+        const { jobPosition } = userData;
+  
+        console.log('User Logged In!', userData);
+  
+        if (
+          jobPosition === 'Floor Manager' ||
+          jobPosition === 'HR Manager' ||
+          jobPosition === 'OM'
+        ) {
+          // Admin user
+          this.props.navigation.navigate('Tabs2');
+        } else {
+          // Regular user
+          this.props.navigation.navigate('Tabs');
+        }
+      } else {
+        console.log('User data not found.');
+        // Handle the case where user data is not found in Firestore
+        // You can show an error message or redirect to an appropriate screen
+      }
+    } catch (error) {
+      if (
+        error.code === 'auth/user-not-found' ||
+        error.code === 'auth/wrong-password' ||
+        error.code === 'auth/invalid-credential'
+      ) {
+        Alert.alert('Error', 'User Not Found or Wrong Password');
+      }
+      if (error.code === 'auth/invalid-email') {
+        Alert.alert('Error', 'Invalid Email');
+      }
+  
+      console.log(error);
     }
   };
-
+  
   handleRegister = () => {
     this.props.navigation.navigate('RegisterScreen');
   };
@@ -100,7 +137,7 @@ export default class LoginScreen extends Component {
             </TouchableOpacity>
           </View>
 
-          <TouchableOpacity style={styles2.opc2} onPress={this.handleLogin}>
+          <TouchableOpacity style={styles2.opc2} onPress={this.logIn}>
             <Text style={{textAlign: 'center', fontSize: 20}}>Login</Text>
           </TouchableOpacity>
           <TouchableOpacity style={styles2.opc2} onPress={this.handleRegister}>

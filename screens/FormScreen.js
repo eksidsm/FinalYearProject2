@@ -1,13 +1,79 @@
-import { Dimensions, ImageBackground, Text, View, StyleSheet, TextInput, TouchableOpacity } from 'react-native'
+import { Dimensions, ImageBackground, Text, View, StyleSheet, TextInput, TouchableOpacity, Alert } from 'react-native'
 import React, { Component } from 'react'
 import styles from '../globalStyles'
+import firestore from '@react-native-firebase/firestore'
+import auth from '@react-native-firebase/auth'
 
 const rh = Dimensions.get("window").height;
 const rw = Dimensions.get('window').width;
 
 export default class FormScreen extends Component {
-  handleContinue = () => { 
-    this.props.navigation.navigate("RecordScreen")
+  constructor(props){
+    super(props);
+    this.state = {
+      email: null,
+      name: null,
+      phonenb: null,
+      message: null,
+      waiterName: null,
+    }
+  }
+
+  handleContinue = async () => {
+    const { email, name, phonenb, message, waiterName } = this.state;
+    const user = auth().currentUser;
+    if (user) {
+      const uid = user.uid;
+      const userRef = firestore().collection('users').doc(uid);
+
+      userRef.get().then((doc) => {
+        if (doc.exists) {
+          const userData = doc.data();
+          this.setState({
+            waiterName: userData.fullName,
+          });
+        } else {
+          console.log('No such document!');
+        }
+      });
+    }
+
+    console.log('waiter name to be added ', waiterName);
+  
+    if (email && name && phonenb && waiterName) {
+      try {
+        const reviewData = {
+          email,
+          name,
+          phonenb,
+          message,
+          waiterName ,
+        }
+  
+        // Save the review to Firestore
+        await firestore().collection('reviews').add(reviewData);
+  
+        console.log('Review submitted');
+        this.props.navigation.navigate('RecordScreen');
+      } catch (error) {
+        console.error('Error submitting review:', error);
+      }
+    } else {
+      Alert.alert('Error', 'Please fill out all required fields');
+    }
+  };
+  
+
+  setName = newName => {
+    this.setState({name: newName});
+  }
+
+  setEmail = newEmail => {
+    this.setState({email: newEmail});
+  }
+
+  setPhoneNb = newPhoneNb => {
+    this.setState({phonenb: newPhoneNb})
   }
   render() {
     return (
@@ -21,15 +87,18 @@ export default class FormScreen extends Component {
             <Text style={styles.txt}>Email of the customer: *</Text>
             <TextInput 
             style={styles.txtInput}
-            placeholder='Enter your Email Address'/>
+            placeholder='Enter your Email Address'
+            onChangeText={this.setEmail}/>
             <Text style={styles.txt}>Name of the customer: *</Text>
             <TextInput 
             style={styles.txtInput}
-            placeholder='Enter your Full Name'/>
+            placeholder='Enter your Full Name'
+            onChangeText={this.setName}/>
             <Text style={styles.txt}>Phone Number of the customer: *</Text>
             <TextInput 
             style={styles.txtInput}
-            placeholder='Enter your Phone Number'/>
+            placeholder='Enter your Phone Number'
+            onChangeText={this.setPhoneNb}/>
             <Text style={styles.txt}>Message(Optional):</Text>
             <TextInput 
             style={{
