@@ -1,7 +1,10 @@
 import React, { Component } from 'react';
-import { Text, View, StyleSheet, TouchableOpacity, Dimensions } from 'react-native';
+import { Text, View, StyleSheet, TouchableOpacity, Dimensions, Alert } from 'react-native';
 import { Camera, getCameraDevice } from 'react-native-vision-camera';
-import firebase from '@react-native-firebase/storage'
+import storage from '@react-native-firebase/storage'
+import auth from '@react-native-firebase/auth'
+import firestore from '@react-native-firebase/firestore'
+import { utils } from '@react-native-firebase/app';
 
 const rh = Dimensions.get('window').height;
 const rw = Dimensions.get('window').width;
@@ -13,6 +16,7 @@ export default class RecordScreen extends Component {
     this.state = {
       isRecording: false,
       recordingDuration: 0,
+      fullName: '',
     };
   }
 
@@ -26,7 +30,27 @@ export default class RecordScreen extends Component {
       physicalDevices: ['ultra-wide-angle-camera', 'wide-angle-camera', 'telephoto-camera'],
     });
     if (device == null) return <NoCameraDeviceError />;
+    this.fetchUserData();
   }
+
+  fetchUserData = () => {
+    const user = auth().currentUser;
+    if (user) {
+      const uid = user.uid;
+      const userRef = firestore().collection('users').doc(uid);
+
+      userRef.get().then((doc) => {
+        if (doc.exists) {
+          const userData = doc.data();
+          this.setState({
+            fullName: userData.fullName,
+          });
+        } else {
+          console.log('No such document!');
+        }
+      });
+    }
+  };
 
   handleStartRecording = async () => {
     try {
@@ -38,8 +62,8 @@ export default class RecordScreen extends Component {
         },
         onRecordingFinished: (video) => {
           console.log('Recording finished:', video);
-          this.uploadVideoToFirebase(video);
-          console.log(video);
+          console.log('video path is ', video.path);
+          this.uploadToFirebase(video.path);
         },
       });
       this.setState({ isRecording: true });
@@ -54,7 +78,7 @@ export default class RecordScreen extends Component {
       const result = await this.camera.current.stopRecording();
       this.setState({ isRecording: false, recordingDuration: 0 });
       this.stopRecordingTimer();
-
+      this.props.navigation.navigate('HomeScreen');
     } catch (error) {
       console.error('Error stopping recording:', error);
     }
@@ -72,16 +96,56 @@ export default class RecordScreen extends Component {
   stopRecordingTimer = () => {
     clearInterval(this.recordingInterval);
   };
-
-  uploadVideoToFirebase = async (video) => {
-    try {
-      const storageRef = firebase.storage().ref();
-      const videoRef = storageRef.child(`videos/${video.fileName}`);
-      await videoRef.putFile(video.uri);
   
-      console.log('Video uploaded to Firebase Storage');
+  // uploadToFirebase = async (videoPath) => {
+  //   try {
+  //     const storageRef = storage().ref();
+  //     const fullName = this.state.fullName.replace(/\s+/g, '');
+  //     const currentDate = new Date().toISOString().slice(0, 10);
+  //     const reviewID = this.props.route.params.reviewID;
+
+  //     // Update the video details in Firestore with the review ID
+  //     const videoDetails = {
+  //       name: this.state.fullName,
+  //       date: new Date().toISOString().slice(0, 10),
+  //       reviewID,
+  //     };
+
+  //     const videoFileName = `reviews-videos/${fullName}_${currentDate}.mp4`;
+
+  //     const response = await storageRef.child(videoFileName).putFile(videoPath);
+  //     await firestore().collection('videos').add(videoDetails);
+  //     console.log('Video uploaded successfully:', response);
+  //   } catch (error) {
+  //     console.error('Error uploading video to Firebase Storage:', error);
+  //   }
+  // };
+  uploadToFirebase = async (videoPath) => {
+    try {
+      const storageRef = storage().ref();
+      const fullName = this.state.fullName.replace(/\s+/g, '');
+      const currentDate = new Date().toISOString().slice(0, 10);
+      const reviewID = this.props.route.params.reviewID;
+  
+      const videoFileName = `reviews-videos/${fullName}_${currentDate}.mp4`;
+      const videoRef = storageRef.child(videoFileName);
+  
+      const response = await videoRef.putFile(videoPath);
+      const downloadURL = await videoRef.getDownloadURL();
+  
+      // Update the video details in Firestore with the review ID and download URL
+      const videoDetails = {
+        name: this.state.fullName,
+        date: new Date().toISOString().slice(0, 10),
+        reviewID,
+        downloadURL,
+      };
+  
+      await firestore().collection('videos').add(videoDetails);
+      console.log('Video uploaded successfully:', response);
+      {Alert.alert('Success', 'Review submitted successfully!')}
     } catch (error) {
-      console.error('Error uploading video:', error);
+      console.error('Error uploading video to Firebase Storage:', error);
     }
   };
   

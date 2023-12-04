@@ -11,6 +11,8 @@ import {
 import React, {Component} from 'react';
 import firestore from '@react-native-firebase/firestore';
 import auth from '@react-native-firebase/auth';
+import storage from '@react-native-firebase/storage'
+import { utils } from '@react-native-firebase/app';
 
 const rh = Dimensions.get('window').height;
 const rw = Dimensions.get('window').width;
@@ -27,7 +29,7 @@ export default class HomeScreen extends Component {
     // Fetch user data from Firestore
     this.fetchUserData();
   }
-
+    
   fetchUserData = () => {
     const user = auth().currentUser;
     if (user) {
