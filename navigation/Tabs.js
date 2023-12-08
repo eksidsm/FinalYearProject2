@@ -11,6 +11,7 @@ import {createStackNavigator} from '@react-navigation/stack';
 import AdminHomeScreen from '../screens/AdminHomeScreen';
 import EmployeeScreen from '../screens/EmployeeScreen';
 import UserReviews from '../screens/UserReviews';
+import AdminUserView from '../screens/AdminUserView';
 
 
 const Tab = createBottomTabNavigator();
@@ -51,6 +52,11 @@ export default class StackNav extends Component {
           name="RecordScreen"
           component={RecordScreen}
           options={{headerShown: false}}
+        />
+        <Stack.Screen 
+        name='AdminUserView'
+        component={AdminUserView}
+        options={{headerShown: false}}
         />
       </Stack.Navigator>
     );
@@ -124,8 +130,8 @@ class Tabs extends Component {
                 <Image
                   source={
                     focused
-                      ? require('../assets/userc.png')
-                      : require('../assets/user.png')
+                      ? require('../assets/newc.png')
+                      : require('../assets/new.png')
                   }
                   resizeMode="contain"
                   style={{

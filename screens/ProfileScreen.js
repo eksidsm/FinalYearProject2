@@ -92,6 +92,7 @@ export default class ProfileScreen extends Component {
 
           {/* Signout Button */}
           <TouchableOpacity style={styles.signout} onPress={this.signOut}>
+            <Text style={{fontSize: 10}}>Sign Out</Text>
             <Image
               source={require('../assets/logout.png')}
               style={{width: rw * 0.07, height: rh * 0.035}}

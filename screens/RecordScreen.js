@@ -55,7 +55,7 @@ export default class RecordScreen extends Component {
   handleStartRecording = async () => {
     try {
       await this.camera.current.startRecording({
-        quality: '720p',
+        quality: '480p',
         maxDuration: 60,
         onRecordingError: (error) => {
           console.error('Recording error:', error);
@@ -73,12 +73,16 @@ export default class RecordScreen extends Component {
     }
   };
 
+  handleDone = () => {
+    this.props.navigation.navigate('Tabs');
+  }
+
   handleStopRecording = async () => {
     try {
       const result = await this.camera.current.stopRecording();
       this.setState({ isRecording: false, recordingDuration: 0 });
       this.stopRecordingTimer();
-      this.props.navigation.navigate('HomeScreen');
+
     } catch (error) {
       console.error('Error stopping recording:', error);
     }
@@ -97,29 +101,6 @@ export default class RecordScreen extends Component {
     clearInterval(this.recordingInterval);
   };
   
-  // uploadToFirebase = async (videoPath) => {
-  //   try {
-  //     const storageRef = storage().ref();
-  //     const fullName = this.state.fullName.replace(/\s+/g, '');
-  //     const currentDate = new Date().toISOString().slice(0, 10);
-  //     const reviewID = this.props.route.params.reviewID;
-
-  //     // Update the video details in Firestore with the review ID
-  //     const videoDetails = {
-  //       name: this.state.fullName,
-  //       date: new Date().toISOString().slice(0, 10),
-  //       reviewID,
-  //     };
-
-  //     const videoFileName = `reviews-videos/${fullName}_${currentDate}.mp4`;
-
-  //     const response = await storageRef.child(videoFileName).putFile(videoPath);
-  //     await firestore().collection('videos').add(videoDetails);
-  //     console.log('Video uploaded successfully:', response);
-  //   } catch (error) {
-  //     console.error('Error uploading video to Firebase Storage:', error);
-  //   }
-  // };
   uploadToFirebase = async (videoPath) => {
     try {
       const storageRef = storage().ref();
@@ -172,10 +153,13 @@ export default class RecordScreen extends Component {
         </View>
         <View style={styles.btnContainer}>
           <TouchableOpacity style={styles.btn} onPress={this.handleStartRecording}>
-            <Text style={{ fontSize: 25, color: 'white' }}>Start</Text>
+            <Text style={{ fontSize: 12, color: 'white' }}>Start</Text>
           </TouchableOpacity>
           <TouchableOpacity style={styles.btn} onPress={this.handleStopRecording}>
-            <Text style={{ fontSize: 25, color: 'white' }}>Stop & Submit</Text>
+            <Text style={{ fontSize: 12, color: 'white' }}>Stop & Submit</Text>
+          </TouchableOpacity>
+          <TouchableOpacity style={styles.btn} onPress={this.handleDone}>
+            <Text style={{ fontSize: 12, color: 'white' }}>Go Home</Text>
           </TouchableOpacity>
         </View>
       </View>
@@ -186,7 +170,7 @@ export default class RecordScreen extends Component {
 const styles = StyleSheet.create({
   camera: {
     height: rh * 0.8,
-    width: rw * 1.2,
+    width: rw,
   },
   timerContainer: {
     position: 'absolute',
@@ -204,11 +188,11 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
   },
   btn: {
-    width: rw * 0.3,
+    width: rw * 0.18,
     height: rh * 0.1,
     backgroundColor: 'black',
     borderRadius: 10,
-    margin: rw * 0.09,
+    margin: rw * 0.07,
     justifyContent: 'center',
     alignItems: 'center',
   },

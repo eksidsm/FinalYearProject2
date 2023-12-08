@@ -9,6 +9,7 @@ import {
   TouchableOpacity,
   Alert,
   SafeAreaView,
+  KeyboardAvoidingView,
 } from 'react-native';
 import React, {Component} from 'react';
 import styles from '../globalStyles';
@@ -55,8 +56,6 @@ export default class LoginScreen extends Component {
         }
       } else {
         console.log('User data not found.');
-        // Handle the case where user data is not found in Firestore
-        // You can show an error message or redirect to an appropriate screen
       }
     } catch (error) {
       if (
@@ -87,7 +86,8 @@ export default class LoginScreen extends Component {
   };
   render() {
     return (
-      <View style={styles.container}>
+      <KeyboardAvoidingView behavior='position' keyboardVerticalOffset={rh*0.03} style={{flex: 1}}>
+        <View style={styles.container}>
         <ImageBackground
           source={require('../assets/bg2.jpg')}
           style={styles.bgImg}>
@@ -104,13 +104,13 @@ export default class LoginScreen extends Component {
             style={{
               paddingHorizontal: 30,
               fontSize: 20,
-              marginTop: 10,
+              marginTop: rh * 0.02,
               color: 'white',
             }}>
             Add Reviews, Track Your Performance, Enhance Your Profile and
             Experience & more
           </Text>
-          <View style={{marginTop: 30}}>
+          <View style={{marginTop: rh * 0.04}}>
             <TextInput
               placeholder="Email Address"
               placeholderTextColor="grey"
@@ -124,17 +124,6 @@ export default class LoginScreen extends Component {
               style={styles.txtInput}
               onChangeText={this.handlePass}
             />
-            <TouchableOpacity onPress={this.handleForgotPass}>
-              <Text
-                style={{
-                  color: 'blue',
-                  fontSize: 12,
-                  marginLeft: rw * 0.12,
-                  marginTop: rh * 0.015,
-                }}>
-                Forgotten Password?
-              </Text>
-            </TouchableOpacity>
           </View>
 
           <TouchableOpacity style={styles2.opc2} onPress={this.logIn}>
@@ -147,6 +136,7 @@ export default class LoginScreen extends Component {
           </TouchableOpacity>
         </ImageBackground>
       </View>
+      </KeyboardAvoidingView>
     );
   }
 }
